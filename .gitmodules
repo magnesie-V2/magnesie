@@ -1,0 +1,12 @@
+[submodule "magnesie-image-storage"]
+	path = magnesie-image-storage
+	url = https://github.com/magnesie-V2/magnesie-image-storage
+[submodule "magnesie-result-storage"]
+	path = magnesie-result-storage
+	url = https://github.com/magnesie-V2/magnesie-result-storage
+[submodule "magnesie-orchestrator"]
+	path = magnesie-orchestrator
+	url = https://github.com/magnesie-V2/magnesie-orchestrator
+[submodule "magnesie-photogrammetry"]
+	path = magnesie-photogrammetry
+	url = https://github.com/magnesie-V2/magnesie-photogrammetry

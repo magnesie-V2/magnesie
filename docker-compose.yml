@@ -1,0 +1,53 @@
+version: '3.9'
+services:
+  database:
+    build: magnesie-image-storage/database
+    volumes: 
+      - databaseStorage:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    
+  image-storage-webservice:
+    depends_on:
+      - database
+    build: magnesie-image-storage/webservice
+    volumes: 
+      - hostedFiles:/hostedFiles
+    ports:
+      - 7880:7880
+    environment:
+      - ROCKET_DATABASES={rocket_app={url="mysql://magnesie_image_storage:password@database:3307/magnesie_image_storage"}}
+      - ROCKET_PORT=7880
+      - HOSTED_FILES_FOLDER=/hostedFiles
+    command: sh -c '/bin/wait-for.sh database:3307 -t 60 -- /usr/local/bin/webservice'
+
+  result-storage-webservice:
+    depends_on:
+      - database
+    build: magnesie-result-storage/webservice
+    volumes:
+      - hostedFiles:/hostedFiles
+    ports:
+      - 7881:7881
+    environment:
+      - ROCKET_DATABASES={rocket_app={url="mysql://magnesie_result_storage:password@database:3307/magnesie_result_storage"}}
+      - ROCKET_PORT=7881
+    command: sh -c '/bin/wait-for.sh database:3307 -t 60 -- /usr/local/bin/webservice'
+
+  orchestrator:
+    depends_on:
+      - image-storage-webservice
+      - result-storage-webservice
+    build: magnesie-orchestrator
+    ports:
+      - 7878:7878
+    environment:
+      - IMAGE_STORAGE_WS_HOST=image-storage-webservice
+      - IMAGE_STORAGE_WS_PORT=7880
+      - RESULT_STORAGE_WS_HOST=result-storage-webservice
+      - RESULT_STORAGE_WS_PORT=7881
+      - ORCHESTRATOR_WS_PORT=7878
+    command: sh -c 'bash /bin/wait-for.sh image-storage-webservice:7880 result-storage-webservice:7881 -t 60 -- ./magnesie-orchestrator'
+
+volumes:
+  databaseStorage: {}
+  hostedFiles: {}
