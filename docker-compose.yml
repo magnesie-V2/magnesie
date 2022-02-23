@@ -9,7 +9,7 @@ services:
   result-storage-webservice:
     depends_on:
       - database
-    build: magnesie-result-storage/webservice
+    build: magnesie-result-storage
     volumes:
       - hostedFiles:/hostedFiles
     ports:
@@ -38,6 +38,13 @@ services:
     privileged: true
     ports:
       - ${PHOTOGRAMMETRY_WS_PORT}:8000
+    volumes:
+      - photogrammetryLogs:/logs
+
+  api-seduce-mock:
+    build: back-end-mocks
+    ports:
+      - 7882:7882
 
   orchestrator:
     depends_on:
@@ -54,9 +61,13 @@ services:
       - RESULT_STORAGE_WS_PORT=7881
       - PHOTOGRAMMETRY_WS_HOST=photogrammetry
       - PHOTOGRAMMETRY_WS_PORT=8000
+      - SEDUCE_API_HOST=api-seduce-mock
+      - SEDUCE_API_PORT=7882
+      - ORCHESTRATOR_WS_HOST=orchestrator
       - ORCHESTRATOR_WS_PORT=7878
     command: sh -c 'bash /bin/wait-for.sh image-storage-webservice:7880 -t 90 -- ./magnesie-orchestrator'
 
 volumes:
   databaseStorage: {}
   hostedFiles: {}
+  photogrammetryLogs: {}

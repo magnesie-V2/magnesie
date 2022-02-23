@@ -10,3 +10,6 @@
 [submodule "magnesie-photogrammetry"]
 	path = magnesie-photogrammetry
 	url = https://github.com/magnesie-V2/magnesie-photogrammetry
+[submodule "back-end-mocks"]
+	path = back-end-mocks
+	url = https://github.com/magnesie-V2/back-end-mocks
